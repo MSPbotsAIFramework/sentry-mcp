@@ -19,7 +19,9 @@
     "type": "auto",
     "source": "design",
     "text": "Any tool call without X-Sentry-Auth-Token returns HTTP 401 with required_headers listing X-Sentry-Auth-Token.",
-    "tests": ["tests/test_middleware.py::test_missing_header_returns_401"]
+    "tests": ["tests/test_middleware.py::test_missing_header_returns_401"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_middleware.py::test_missing_header_returns_401 -q -> 3 passed (parametrized: {}, placeholder token, blank token) @ dev/PRD-21331 6c60b5b; also confirmed live via curl against a running local server: POST /mcp with no header -> HTTP 401, body {\"required_headers\":[\"X-Sentry-Auth-Token\"]}"
   },
   {
     "id": "TC-SENTRY-003",
@@ -226,7 +228,9 @@
     "type": "auto",
     "source": "design",
     "text": "_STATUS_TO_CODE maps 400/401/403/404/409/429/500/network-timeout to the documented error codes and retryable flags; none raise past run_tool.",
-    "tests": ["tests/test_tools.py::test_status_to_code_mapping"]
+    "tests": ["tests/test_tools.py::test_status_to_code_mapping"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_tools.py::test_status_to_code_mapping -q -> 8 passed (400,401,403,404,409,429,500,0) @ dev/PRD-21331 6c60b5b"
   },
   {
     "id": "TC-SENTRY-019",
@@ -247,7 +251,9 @@
     "type": "auto",
     "source": "design",
     "text": "A mocked oversized sentry_list_issues response (>20000 chars serialized) is returned truncated with has_more rather than erroring or silently dropping records.",
-    "tests": ["tests/test_tools.py::test_dump_json_capped_truncates_large_list"]
+    "tests": ["tests/test_tools.py::test_dump_json_capped_truncates_large_list"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_tools.py::test_dump_json_capped_truncates_large_list -q -> 1 passed; serialized text <= 20000 chars, 0 < returned_count < 25, has_more=true, truncated=true, next_cursor removed (would skip cut records) @ dev/PRD-21331 6c60b5b"
   },
   {
     "id": "TC-SENTRY-021",
@@ -255,7 +261,9 @@
     "type": "auto",
     "source": "design",
     "text": "repr(SentryCredentials(...)) and every error path's logged output do not contain the raw token value.",
-    "tests": ["tests/test_tools.py::test_credentials_repr_redacts_token"]
+    "tests": ["tests/test_tools.py::test_credentials_repr_redacts_token"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_tools.py::test_credentials_repr_redacts_token -q -> 1 passed; repr() contains 'redacted', not the token value @ dev/PRD-21331 6c60b5b"
   },
   {
     "id": "TC-SENTRY-022",
@@ -263,6 +271,8 @@
     "type": "auto",
     "source": "design",
     "text": "Two concurrent simulated requests carrying different X-Sentry-Auth-Token (and X-Sentry-Base-URL) values each see only their own credential inside the tool body.",
-    "tests": ["tests/test_middleware.py::test_concurrent_requests_isolate_credentials"]
+    "tests": ["tests/test_middleware.py::test_concurrent_requests_isolate_credentials"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_middleware.py::test_concurrent_requests_isolate_credentials -q -> 1 passed; two concurrent requests (tenant-a, tenant-b) each observed only their own token before and after an await point @ dev/PRD-21331 6c60b5b"
   }
 ]
