@@ -1,0 +1,278 @@
+[
+  {
+    "id": "TC-SENTRY-001",
+    "ac": "AC1",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_list_organizations with a valid X-Sentry-Auth-Token returns the token's accessible organizations with id/slug/name.",
+    "steps": [
+      "Set X-Sentry-Auth-Token to a valid Sentry Auth Token",
+      "Call sentry_list_organizations with no arguments"
+    ],
+    "expect": "Result is a JSON object with an organizations list; each entry has id, slug and name fields.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-002",
+    "ac": "AC2",
+    "type": "auto",
+    "source": "design",
+    "text": "Any tool call without X-Sentry-Auth-Token returns HTTP 401 with required_headers listing X-Sentry-Auth-Token.",
+    "tests": ["tests/test_middleware.py::test_missing_header_returns_401"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_middleware.py::test_missing_header_returns_401 -q -> 3 passed (parametrized: {}, placeholder token, blank token) @ dev/PRD-21331 6c60b5b; also confirmed live via curl against a running local server: POST /mcp with no header -> HTTP 401, body {\"required_headers\":[\"X-Sentry-Auth-Token\"]}"
+  },
+  {
+    "id": "TC-SENTRY-003",
+    "ac": "AC3",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_list_projects for a known organization slug returns that org's projects with id/slug/name/platform.",
+    "steps": [
+      "Call sentry_list_projects with a known organization_slug"
+    ],
+    "expect": "Result's projects list contains the known project(s), each with id, slug, name and platform.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-004",
+    "ac": "AC4",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_get_project for a known org+project slug returns project detail including teams and dateCreated.",
+    "steps": [
+      "Call sentry_get_project with a known organization_slug and project_slug"
+    ],
+    "expect": "Result includes id, slug, name, platform, teams and dateCreated for that project.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-005",
+    "ac": "AC5",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_list_issues with no query returns only unresolved issues (Sentry's default is:unresolved).",
+    "steps": [
+      "Call sentry_list_issues with a known organization_slug and no query argument"
+    ],
+    "expect": "Every issue in the result has status unresolved.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-006",
+    "ac": "AC5",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_list_issues with query=\"\" returns issues regardless of status, not just unresolved.",
+    "steps": [
+      "Call sentry_list_issues with a known organization_slug and query set to an empty string",
+      "Compare against a known resolved issue in that project"
+    ],
+    "expect": "The known resolved issue appears in the result even though its status is not unresolved.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-007",
+    "ac": "AC6",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_get_issue on a known issue id returns title/status/level/firstSeen/lastSeen/assignedTo.",
+    "steps": [
+      "Call sentry_get_issue with a known organization_slug and issue_id"
+    ],
+    "expect": "Result includes title, status, level, firstSeen, lastSeen and assignedTo fields matching the known issue.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-008",
+    "ac": "AC7",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_update_issue(status=\"resolved\") on an unresolved issue changes its status to resolved.",
+    "steps": [
+      "Call sentry_update_issue with a known unresolved issue_id and status set to resolved",
+      "Call sentry_get_issue on the same issue_id"
+    ],
+    "expect": "The follow-up sentry_get_issue shows status resolved.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-009",
+    "ac": "AC7",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_update_issue(assigned_to=<member>) sets assignedTo on an issue without changing its status.",
+    "steps": [
+      "Note the current status of a known issue via sentry_get_issue",
+      "Call sentry_update_issue with that issue_id and assigned_to set to a known organization member",
+      "Call sentry_get_issue again on the same issue_id"
+    ],
+    "expect": "assignedTo now matches the given member; status is unchanged from the first sentry_get_issue call.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-010",
+    "ac": "AC8",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_list_issue_events on an issue with multiple events returns those events with eventID/dateCreated.",
+    "steps": [
+      "Call sentry_list_issue_events with a known organization_slug and issue_id that has more than one event"
+    ],
+    "expect": "Result's events list has more than one entry, each with eventID and dateCreated.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-011",
+    "ac": "AC9",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_get_issue_event on a known issue+event id returns entries with exception/stacktrace data and a tags list.",
+    "steps": [
+      "Call sentry_get_issue_event with a known organization_slug, issue_id and event_id"
+    ],
+    "expect": "Result includes an entries array containing exception/stacktrace data, and a tags list.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-012",
+    "ac": "AC10",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_list_members for a known organization returns members with email/orgRole/pending.",
+    "steps": [
+      "Call sentry_list_members with a known organization_slug"
+    ],
+    "expect": "Result's members list contains at least one entry with email, orgRole and pending fields.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-013",
+    "ac": "AC11",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_list_releases for a known organization returns releases with version/dateCreated.",
+    "steps": [
+      "Call sentry_list_releases with a known organization_slug"
+    ],
+    "expect": "Result's releases list contains at least one entry with version and dateCreated.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-014",
+    "ac": "AC12",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_get_release on a known version returns release detail including newGroups/commitCount.",
+    "steps": [
+      "Call sentry_get_release with a known organization_slug and version"
+    ],
+    "expect": "Result includes version, projects, newGroups and commitCount.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-015",
+    "ac": "AC13",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_create_release(version=\"test-v1\", projects=[...]) creates a new release returned with the given version.",
+    "steps": [
+      "Call sentry_create_release with a new, not-yet-used version string and a known project slug"
+    ],
+    "expect": "Result is the created release object with version equal to the given string.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-016",
+    "ac": "AC13",
+    "type": "manual",
+    "source": "design",
+    "text": "Calling sentry_create_release again with the same version returns the existing release rather than an error.",
+    "steps": [
+      "Call sentry_create_release a second time with the same version and projects used in TC-SENTRY-015"
+    ],
+    "expect": "Call succeeds (no error envelope) and returns a release with the same id as the one created in TC-SENTRY-015.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-017",
+    "ac": "AC14",
+    "type": "manual",
+    "source": "design",
+    "text": "sentry_create_deploy(version=<existing release>, environment=\"production\") creates a deploy record returned with that environment.",
+    "steps": [
+      "Call sentry_create_deploy with the version from TC-SENTRY-015 and environment set to production"
+    ],
+    "expect": "Result is the created deploy object with environment equal to production.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-018",
+    "ac": "AC15",
+    "type": "auto",
+    "source": "design",
+    "text": "_STATUS_TO_CODE maps 400/401/403/404/409/429/500/network-timeout to the documented error codes and retryable flags; none raise past run_tool.",
+    "tests": ["tests/test_tools.py::test_status_to_code_mapping"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_tools.py::test_status_to_code_mapping -q -> 8 passed (400,401,403,404,409,429,500,0) @ dev/PRD-21331 6c60b5b"
+  },
+  {
+    "id": "TC-SENTRY-019",
+    "ac": "AC15",
+    "type": "manual",
+    "source": "design",
+    "text": "A real call against a deliberately invalid issue id returns not_found via the structured envelope, not an exception.",
+    "steps": [
+      "Call sentry_get_issue with a known organization_slug and an issue_id that does not exist"
+    ],
+    "expect": "Result is the structured error envelope with code not_found; no exception/traceback is surfaced.",
+    "result": "untested",
+    "notes": "needs a real vendor account"
+  },
+  {
+    "id": "TC-SENTRY-020",
+    "ac": "AC16",
+    "type": "auto",
+    "source": "design",
+    "text": "A mocked oversized sentry_list_issues response (>20000 chars serialized) is returned truncated with has_more rather than erroring or silently dropping records.",
+    "tests": ["tests/test_tools.py::test_dump_json_capped_truncates_large_list"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_tools.py::test_dump_json_capped_truncates_large_list -q -> 1 passed; serialized text <= 20000 chars, 0 < returned_count < 25, has_more=true, truncated=true, next_cursor removed (would skip cut records) @ dev/PRD-21331 6c60b5b"
+  },
+  {
+    "id": "TC-SENTRY-021",
+    "ac": "AC17",
+    "type": "auto",
+    "source": "design",
+    "text": "repr(SentryCredentials(...)) and every error path's logged output do not contain the raw token value.",
+    "tests": ["tests/test_tools.py::test_credentials_repr_redacts_token"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_tools.py::test_credentials_repr_redacts_token -q -> 1 passed; repr() contains 'redacted', not the token value @ dev/PRD-21331 6c60b5b"
+  },
+  {
+    "id": "TC-SENTRY-022",
+    "ac": "AC18",
+    "type": "auto",
+    "source": "design",
+    "text": "Two concurrent simulated requests carrying different X-Sentry-Auth-Token (and X-Sentry-Base-URL) values each see only their own credential inside the tool body.",
+    "tests": ["tests/test_middleware.py::test_concurrent_requests_isolate_credentials"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_middleware.py::test_concurrent_requests_isolate_credentials -q -> 1 passed; two concurrent requests (tenant-a, tenant-b) each observed only their own token before and after an await point @ dev/PRD-21331 6c60b5b"
+  }
+]
